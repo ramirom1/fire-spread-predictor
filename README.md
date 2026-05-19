@@ -43,6 +43,63 @@ Matrix createEnvironment(int rows, int cols, unsigned int seed = 0);
 - **Retorna**: `std::vector<std::vector<CellType>>` con el entorno generado
 - Cada ejecución con distinta semilla produce un mapa único
 
+## Algoritmo de propagación del fuego
+
+Después de generar el entorno, el simulador elige aleatoriamente una casilla combustible (`Bosque` o `Ciudad`) y la marca como `Quemándose`.
+
+El estado del fuego se guarda en tres listas:
+
+- `listaFuego1`: casillas prendidas en la iteración actual.
+- `listaFuego2`: casillas que llevan una iteración quemándose.
+- `listaFuego3`: casillas que llevan dos iteraciones quemándose.
+
+En cada iteración:
+
+1. Cada casilla en fuego revisa sus vecinos ortogonales: arriba, abajo, izquierda y derecha.
+2. Solo pueden prenderse las casillas `Bosque` y `Ciudad`.
+3. `Agua`, `Ceniza` y casillas ya `Quemándose` no pueden prenderse.
+4. La probabilidad de ignición depende del tipo de casilla y de cuántos vecinos prendidos tenga.
+5. Las casillas nuevas pasan a `listaFuego1`.
+6. Las casillas de `listaFuego1` avanzan a `listaFuego2`, las de `listaFuego2` a `listaFuego3` y las de `listaFuego3` pasan a `Ceniza`.
+
+Para evitar revisar más de una vez la misma casilla candidata, se usa una matriz auxiliar de booleanos llamada `candidate` junto con una lista `candidates`. Cuando una casilla en fuego encuentra un vecino combustible, primero se verifica si `candidate[fila][columna]` está en `false`. Si todavía no fue marcado, se cambia a `true` y se agrega la posición a `candidates`. Si otro fuego llega al mismo vecino en la misma iteración, la marca ya está en `true`, entonces no se vuelve a agregar.
+
+Después de marcar candidatos, el algoritmo recorre solo la lista `candidates`. Cada casilla candidata se evalúa una sola vez. La probabilidad no aumenta por repetir la prueba, sino por la cantidad real de vecinos prendidos que tiene esa casilla.
+
+Probabilidad base por vecino en fuego:
+
+| Tipo | Probabilidad base |
+|------|-------------------|
+| Agua | `0%` |
+| Bosque | `42%` |
+| Ciudad | `24%` |
+| Quemándose | `0%` |
+| Ceniza | `0%` |
+
+Cuando una casilla tiene más de un vecino en fuego, se usa probabilidad acumulada:
+
+```cpp
+probabilidad = 1 - pow(1 - probabilidadBase, vecinosEnFuego)
+```
+
+Probabilidades acumuladas para `Bosque`:
+
+| Vecinos en fuego | Probabilidad |
+|------------------|--------------|
+| 1 | `42%` |
+| 2 | `66%` |
+| 3 | `80%` |
+| 4 | `89%` |
+
+Probabilidades acumuladas para `Ciudad`:
+
+| Vecinos en fuego | Probabilidad |
+|------------------|--------------|
+| 1 | `24%` |
+| 2 | `42%` |
+| 3 | `56%` |
+| 4 | `67%` |
+
 ## 🖥️ Visualización
 
 La matriz se renderiza en una ventana **SDL2** donde cada celda es un cuadrado coloreado. El tamaño de celda se calcula automáticamente según la resolución de pantalla (85% del tamaño disponible).

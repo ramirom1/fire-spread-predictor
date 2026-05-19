@@ -5,7 +5,14 @@
 #include <ctime>
 #include <algorithm>
 #include <random>
+#include <optional>
 #include <SDL2/SDL.h>
+#include <chrono>
+
+
+using namespace std;
+using namespace std::chrono;
+
 
 // ============================================================
 // Tipos de casilla del entorno
@@ -23,6 +30,17 @@ enum CellType {
 // ============================================================
 using Matrix = std::vector<std::vector<CellType>>;
 
+struct Position {
+    int row;
+    int col;
+};
+
+struct FireState {
+    std::vector<Position> listaFuego1; // Casillas prendidas en la iteracion actual
+    std::vector<Position> listaFuego2; // Casillas con 1 iteracion quemándose
+    std::vector<Position> listaFuego3; // Casillas con 2 iteraciones quemándose
+};
+
 // ============================================================
 // Funciones auxiliares
 // ============================================================
@@ -39,6 +57,138 @@ static std::vector<std::pair<int,int>> neighbors4(int r, int c, int rows, int co
             res.push_back({nr, nc});
     }
     return res;
+}
+
+static double baseIgnitionProbability(CellType type) {
+    switch (type) {
+        case WATER:   return 0.0;  // Un lago no se prende fuego.
+        case FOREST:  return 0.42; // Vegetacion seca: combustible principal.
+        case CITY:    return 0.24; // Zonas urbanas: menos continuidad combustible.
+        case BURNING: return 0.0;
+        case ASH:     return 0.0;
+    }
+    return 0.0;
+}
+
+static bool canIgnite(CellType type) {
+    return type == FOREST || type == CITY;
+}
+
+static int countBurningNeighbors(const Matrix &mat, int row, int col) {
+    int rows = (int)mat.size();
+    int cols = (int)mat[0].size();
+    int burningNeighbors = 0;
+
+    for (auto [nr, nc] : neighbors4(row, col, rows, cols)) {
+        if (mat[nr][nc] == BURNING)
+            ++burningNeighbors;
+    }
+
+    return burningNeighbors;
+}
+
+static double ignitionProbability(CellType type, int burningNeighbors) {
+    double base = baseIgnitionProbability(type);
+    if (base <= 0.0 || burningNeighbors <= 0)
+        return 0.0;
+
+    // Probabilidad acumulada por vecinos independientes:
+    // 1 vecino bosque=42%, 2 vecinos=66%, 3 vecinos=80%, 4 vecinos=89%.
+    double survivalProbability = 1.0;
+    for (int i = 0; i < burningNeighbors; ++i)
+        survivalProbability *= (1.0 - base);
+
+    return 1.0 - survivalProbability;
+}
+
+static std::optional<Position> igniteRandomCell(Matrix &mat, FireState &fireState, std::mt19937 &rng) {
+    std::vector<Position> burnableCells;
+
+    for (int r = 0; r < (int)mat.size(); ++r) {
+        for (int c = 0; c < (int)mat[0].size(); ++c) {
+            if (canIgnite(mat[r][c]))
+                burnableCells.push_back({r, c});
+        }
+    }
+
+    if (burnableCells.empty())
+        return std::nullopt;
+
+    std::uniform_int_distribution<int> randomIndex(0, (int)burnableCells.size() - 1);
+    Position start = burnableCells[randomIndex(rng)];
+
+    mat[start.row][start.col] = BURNING;
+    fireState.listaFuego1.push_back(start);
+
+    return start;
+}
+
+static void markFireCandidates(
+    const Matrix &mat,
+    const std::vector<Position> &burningCells,
+    std::vector<std::vector<bool>> &candidate,
+    std::vector<Position> &candidates
+) {
+    int rows = (int)mat.size();
+    int cols = (int)mat[0].size();
+
+    for (const Position &cell : burningCells) {
+        for (auto [nr, nc] : neighbors4(cell.row, cell.col, rows, cols)) {
+            if (canIgnite(mat[nr][nc]) && !candidate[nr][nc]) {
+                candidate[nr][nc] = true;
+                candidates.push_back({nr, nc});
+            }
+        }
+    }
+}
+
+static int advanceFire(Matrix &mat, FireState &fireState, std::mt19937 &rng) {
+    int rows = (int)mat.size();
+    int cols = (int)mat[0].size();
+    std::uniform_real_distribution<double> probability(0.0, 1.0);
+
+    std::vector<std::vector<bool>> candidate(rows, std::vector<bool>(cols, false));
+    std::vector<Position> candidates;
+    candidates.reserve(
+        4 * (
+            fireState.listaFuego1.size() +
+            fireState.listaFuego2.size() +
+            fireState.listaFuego3.size()
+        )
+    );
+
+    markFireCandidates(mat, fireState.listaFuego1, candidate, candidates);
+    markFireCandidates(mat, fireState.listaFuego2, candidate, candidates);
+    markFireCandidates(mat, fireState.listaFuego3, candidate, candidates);
+
+    std::vector<Position> newFires;
+    for (const Position &cell : candidates) {
+        int burningNeighbors = countBurningNeighbors(mat, cell.row, cell.col);
+        double ignitionChance = ignitionProbability(mat[cell.row][cell.col], burningNeighbors);
+
+        if (probability(rng) <= ignitionChance)
+            newFires.push_back(cell);
+    }
+
+    for (const Position &cell : fireState.listaFuego3)
+        mat[cell.row][cell.col] = ASH;
+
+    fireState.listaFuego3 = std::move(fireState.listaFuego2);
+    fireState.listaFuego2 = std::move(fireState.listaFuego1);
+    fireState.listaFuego1 = std::move(newFires);
+
+    for (const Position &cell : fireState.listaFuego1)
+        mat[cell.row][cell.col] = BURNING;
+
+    return (int)fireState.listaFuego1.size();
+}
+
+static int countActiveFires(const FireState &fireState) {
+    return (int)(
+        fireState.listaFuego1.size() +
+        fireState.listaFuego2.size() +
+        fireState.listaFuego3.size()
+    );
 }
 
 
@@ -342,9 +492,12 @@ void showMatrixSDL(const Matrix &mat, int cellSize = 0) {
 int main() {
     const int ROWS = 500;
     const int COLS = 500;
+    const int MAX_ITERATIONS = 200;
+    unsigned int seed = (unsigned int)std::time(nullptr);
+    std::mt19937 rng(seed);
 
     std::cout << "Generando entorno " << ROWS << "x" << COLS << "..." << std::endl;
-    Matrix env = createEnvironment(ROWS, COLS);
+    Matrix env = createEnvironment(ROWS, COLS, seed);
 
     // Estadísticas
     int counts[5] = {};
@@ -357,9 +510,37 @@ int main() {
     std::cout << "Bosque: " << counts[FOREST]  << " (" << 100.0*counts[FOREST]/total  << "%)\n";
     std::cout << "Ciudad: " << counts[CITY]    << " (" << 100.0*counts[CITY]/total    << "%)\n";
 
-    std::cout << "Abriendo ventana SDL2... (Cerrar con ESC o botón X)" << std::endl;
+    FireState fireState;
+    std::optional<Position> initialFire = igniteRandomCell(env, fireState, rng);
+    if (!initialFire) {
+        std::cerr << "No hay casillas combustibles para iniciar el fuego." << std::endl;
+        return 1;
+    }
+
+    std::cout << "Fuego inicial: (" << initialFire->row << ", " << initialFire->col << ")\n";
+    std::cout << "Simulando " << MAX_ITERATIONS << " iteraciones..." << std::endl;
+
+     auto inicio = high_resolution_clock::now();
+    for(int iteration=0;iteration<MAX_ITERATIONS;iteration++) {
+        int newFires = advanceFire(env, fireState, rng);
+        std::cout << "Iteracion " << iteration
+                  << " | nuevos fuegos: " << newFires
+                  << " | fuegos activos: " << countActiveFires(fireState)
+                  << "\n";
+        if (countActiveFires(fireState) == 0) {
+            std::cout << "El fuego se extinguio en la iteracion " << iteration << ".\n";
+            break;
+        }
+    }
+
+    auto fin = high_resolution_clock::now();
+
+    auto duracion = duration_cast<milliseconds>(fin - inicio);
+
+    cout << "Tiempo: " << duracion.count() << " ms" << endl;
+
+    std::cout << "Abriendo ventana SDL2 con el estado final... (Cerrar con ESC o botón X)" << std::endl;
     showMatrixSDL(env);
 
     return 0;
 }
-
