@@ -6,8 +6,8 @@ TARGET = creator
 
 all: $(TARGET)
 
-$(TARGET): creator.cpp
-	$(CXX) $(CXXFLAGS) -o $@ $< $(SDL_FLAGS)
+$(TARGET): creator.cpp environment.cpp environment.h
+	$(CXX) $(CXXFLAGS) -o $@ creator.cpp environment.cpp $(SDL_FLAGS)
 
 run: $(TARGET)
 	./$(TARGET)

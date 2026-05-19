@@ -18,9 +18,16 @@ Simulador de propagación de fuego sobre un entorno generado proceduralmente, in
 fire-spread-predictor/
 ├── README.md
 ├── install_dependencies.sh      # Script de instalación de dependencias
-└── matrix_creator/
-    ├── creator.cpp              # Generador del entorno + visualización SDL2
-    └── Makefile                 # Compilación y ejecución
+├── matrix_creator/
+│   ├── environment.h            # Tipos, Matrix y funciones públicas del entorno
+│   ├── environment.cpp          # Generación del mapa + visualización SDL2
+│   ├── creator.cpp              # Ejecutable para crear y mostrar solo el mapa
+│   └── Makefile                 # Compilación del generador de mapa
+└── sequential_algorithm/
+    ├── sequential_fire.h        # Estado y funciones del algoritmo secuencial
+    ├── sequential_fire.cpp      # Propagación secuencial del fuego
+    ├── main.cpp                 # Ejecutable de simulación secuencial
+    └── Makefile                 # Compilación del algoritmo secuencial
 ```
 
 ## Generación del entorno
@@ -42,6 +49,7 @@ Matrix createEnvironment(int rows, int cols, unsigned int seed = 0);
 - **Parámetros**: dimensiones de la matriz y semilla opcional (0 = usar `time`)
 - **Retorna**: `std::vector<std::vector<CellType>>` con el entorno generado
 - Cada ejecución con distinta semilla produce un mapa único
+- El algoritmo secuencial usa esta misma matriz como entrada, llamando a `createEnvironment`.
 
 ## Algoritmo de propagación del fuego
 
@@ -120,10 +128,17 @@ O manualmente:
 sudo apt install -y build-essential libsdl2-dev libopenmpi-dev openmpi-bin
 ```
 
-### 2. Compilar y ejecutar
+### 2. Crear y visualizar solo el mapa
 
 ```bash
 cd matrix_creator
+make run
+```
+
+### 3. Ejecutar la simulación secuencial
+
+```bash
+cd sequential_algorithm
 make run
 ```
 
