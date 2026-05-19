@@ -12,7 +12,11 @@ $(TARGET): $(SOURCES) $(HEADERS)
 	$(CXX) $(CXXFLAGS) -o $@ $(SOURCES) $(SDL_FLAGS)
 
 run: $(TARGET)
+ifdef WIND
+	./$(TARGET) --wind $(WIND)
+else
 	./$(TARGET)
+endif
 
 clean:
 	rm -f $(TARGET)

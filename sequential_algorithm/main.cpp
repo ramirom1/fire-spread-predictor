@@ -5,6 +5,12 @@
 #include <iostream>
 #include <random>
 
+static void printUsage(const char *programName) {
+    std::cout << "Uso: " << programName << " [--wind <N|S|E|W>]\n"
+              << "  --wind <dir>  Dirección del viento: N (norte), S (sur), E (este), W (oeste)\n"
+              << "                Sin este parámetro, la simulación corre sin viento.\n";
+}
+
 static void printEnvironmentStats(const Matrix &env) {
     int counts[5] = {};
     for (const auto &row : env)
@@ -20,17 +26,40 @@ static void printEnvironmentStats(const Matrix &env) {
     std::cout << "Ciudad: " << counts[CITY]   << " (" << 100.0 * counts[CITY]   / total << "%)\n";
 }
 
-int main() {
+static const char* windDirectionName(WindDirection wind) {
+    switch (wind) {
+        case WindDirection::NORTH: return "Norte";
+        case WindDirection::SOUTH: return "Sur";
+        case WindDirection::EAST:  return "Este";
+        case WindDirection::WEST:  return "Oeste";
+        default:                   return "Sin viento";
+    }
+}
+
+int main(int argc, char *argv[]) {
     const int ROWS = 500;
     const int COLS = 500;
-    const int MAX_ITERATIONS = 100;
+    const int MAX_ITERATIONS = 200;
     unsigned int seed = (unsigned int)std::time(nullptr);
     std::mt19937 rng(seed);
+
+    // Parsear argumentos
+    WindDirection wind = WindDirection::NONE;
+    for (int i = 1; i < argc; ++i) {
+        if ((std::string(argv[i]) == "--wind" || std::string(argv[i]) == "-w") && i + 1 < argc) {
+            wind = parseWindDirection(argv[++i]);
+        } else if (std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h") {
+            printUsage(argv[0]);
+            return 0;
+        }
+    }
 
     std::cout << "Generando entorno " << ROWS << "x" << COLS << "..." << std::endl;
     Matrix env = createEnvironment(ROWS, COLS, seed);
 
     printEnvironmentStats(env);
+
+    std::cout << "Viento: " << windDirectionName(wind) << std::endl;
 
     FireState fireState;
     std::optional<Position> initialFire = igniteRandomCell(env, fireState, rng);
@@ -44,7 +73,7 @@ int main() {
 
     auto inicio = std::chrono::high_resolution_clock::now();
     for (int iteration = 0; iteration < MAX_ITERATIONS; ++iteration) {
-        int newFires = advanceFire(env, fireState, rng);
+        int newFires = advanceFire(env, fireState, rng, wind);
         std::cout << "Iteracion " << iteration
                   << " | nuevos fuegos: " << newFires
                   << " | fuegos activos: " << countActiveFires(fireState)

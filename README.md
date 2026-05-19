@@ -142,12 +142,31 @@ cd sequential_algorithm
 make run
 ```
 
-Otros comandos del Makefile:
+#### Con viento
+
+El simulador acepta un parámetro `--wind` para indicar la dirección del viento, lo que modifica la propagación del fuego de forma asimétrica:
+
+```bash
+# Usando make con la variable WIND
+make run WIND=N    # Viento hacia el norte
+make run WIND=S    # Viento hacia el sur
+make run WIND=E    # Viento hacia el este
+make run WIND=W    # Viento hacia el oeste
+
+# O ejecutando el binario directamente
+./sequential_fire --wind N
+./sequential_fire -w S
+```
+
+Sin el parámetro, la simulación corre sin viento (propagación isotrópica).
+
+#### Comandos del Makefile
 
 | Comando | Acción |
 |---------|--------|
 | `make` | Solo compilar |
-| `make run` | Compilar y ejecutar |
+| `make run` | Compilar y ejecutar sin viento |
+| `make run WIND=N` | Compilar y ejecutar con viento al norte |
 | `make clean` | Eliminar binario |
 
 ## 🔧 Dependencias
