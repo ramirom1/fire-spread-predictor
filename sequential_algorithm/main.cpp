@@ -15,6 +15,7 @@ static void printUsage(const char *programName) {
               << "  --rows <n>         Filas de la grilla (defecto: 500)\n"
               << "  --cols <n>         Columnas de la grilla (defecto: 500)\n"
               << "  --batch            Modo batch: ejecuta todo y muestra resultado final\n"
+              << "  --no-gui           Sin visualización: solo ejecuta y mide tiempo\n"
               << "  --help, -h         Muestra esta ayuda\n"
               << "\n"
               << "Modo animado (defecto):\n"
@@ -57,8 +58,8 @@ static const char* windDirectionName(WindDirection wind) {
 // ════════════════════════════════════════════════════════════════
 // Modo batch (comportamiento original)
 // ════════════════════════════════════════════════════════════════
-static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind) {
-    const int MAX_ITERATIONS = 200;
+static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind, bool showGui) {
+    const int MAX_ITERATIONS = 50000;
     std::mt19937 rng(seed);
 
     std::cout << "Generando entorno " << rows << "x" << cols << "..." << std::endl;
@@ -78,12 +79,13 @@ static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind) {
     std::cout << "Simulando " << MAX_ITERATIONS << " iteraciones..." << std::endl;
 
     auto inicio = std::chrono::high_resolution_clock::now();
+    
     for (int iteration = 0; iteration < MAX_ITERATIONS; ++iteration) {
         int newFires = advanceFire(env, fireState, rng, wind);
-        std::cout << "Iteracion " << iteration
-                  << " | nuevos fuegos: " << newFires
-                  << " | fuegos activos: " << countActiveFires(fireState)
-                  << "\n";
+        //std::cout << "Iteracion " << iteration
+        //          << " | nuevos fuegos: " << newFires
+        //          << " | fuegos activos: " << countActiveFires(fireState)
+        //          << "\n";
 
         if (countActiveFires(fireState) == 0) {
             std::cout << "El fuego se extinguio en la iteracion " << iteration << ".\n";
@@ -95,8 +97,10 @@ static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind) {
     auto duracion = std::chrono::duration_cast<std::chrono::milliseconds>(fin - inicio);
     std::cout << "Tiempo: " << duracion.count() << " ms" << std::endl;
 
-    std::cout << "Abriendo ventana SDL2 con el estado final... (Cerrar con ESC o botón X)" << std::endl;
-    showMatrixSDL(env);
+    if (showGui) {
+        std::cout << "Abriendo ventana SDL2 con el estado final... (Cerrar con ESC o botón X)" << std::endl;
+        showMatrixSDL(env);
+    }
 
     return 0;
 }
@@ -110,6 +114,7 @@ int main(int argc, char *argv[]) {
     unsigned int seed = (unsigned int)std::time(nullptr);
     WindDirection wind = WindDirection::NONE;
     bool batchMode = false;
+    bool noGui = false;
 
     // Parsear argumentos
     for (int i = 1; i < argc; ++i) {
@@ -122,6 +127,9 @@ int main(int argc, char *argv[]) {
             cols = std::stoi(argv[++i]);
         } else if (arg == "--batch") {
             batchMode = true;
+        } else if (arg == "--no-gui") {
+            noGui = true;
+            batchMode = true;
         } else if (arg == "--help" || arg == "-h") {
             printUsage(argv[0]);
             return 0;
@@ -129,7 +137,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (batchMode) {
-        return runBatch(rows, cols, seed, wind);
+        return runBatch(rows, cols, seed, wind, !noGui);
     }
 
     // Modo animado (defecto)
