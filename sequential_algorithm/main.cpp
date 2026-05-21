@@ -1,14 +1,32 @@
 #include "sequential_fire.h"
+#include "animated_view.h"
 
 #include <chrono>
 #include <ctime>
 #include <iostream>
 #include <random>
+#include <string>
 
 static void printUsage(const char *programName) {
-    std::cout << "Uso: " << programName << " [--wind <N|S|E|W>]\n"
-              << "  --wind <dir>  Dirección del viento: N (norte), S (sur), E (este), W (oeste)\n"
-              << "                Sin este parámetro, la simulación corre sin viento.\n";
+    std::cout << "Uso: " << programName << " [opciones]\n"
+              << "\n"
+              << "Opciones:\n"
+              << "  --wind <N|S|E|W>   Dirección del viento (defecto: sin viento)\n"
+              << "  --rows <n>         Filas de la grilla (defecto: 500)\n"
+              << "  --cols <n>         Columnas de la grilla (defecto: 500)\n"
+              << "  --batch            Modo batch: ejecuta todo y muestra resultado final\n"
+              << "  --help, -h         Muestra esta ayuda\n"
+              << "\n"
+              << "Modo animado (defecto):\n"
+              << "  SPACE        – Play / Pause\n"
+              << "  S            – Single step\n"
+              << "  R            – Reset (nuevo mapa aleatorio)\n"
+              << "  UP / DOWN    – Aumentar / Reducir velocidad\n"
+              << "  Scroll       – Zoom (centrado en cursor)\n"
+              << "  Click+Drag   – Pan\n"
+              << "  +/-          – Zoom (centrado en pantalla)\n"
+              << "  0            – Reset zoom (ver todo)\n"
+              << "  ESC          – Salir\n";
 }
 
 static void printEnvironmentStats(const Matrix &env) {
@@ -36,29 +54,17 @@ static const char* windDirectionName(WindDirection wind) {
     }
 }
 
-int main(int argc, char *argv[]) {
-    const int ROWS = 500;
-    const int COLS = 500;
+// ════════════════════════════════════════════════════════════════
+// Modo batch (comportamiento original)
+// ════════════════════════════════════════════════════════════════
+static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind) {
     const int MAX_ITERATIONS = 200;
-    unsigned int seed = (unsigned int)std::time(nullptr);
     std::mt19937 rng(seed);
 
-    // Parsear argumentos
-    WindDirection wind = WindDirection::NONE;
-    for (int i = 1; i < argc; ++i) {
-        if ((std::string(argv[i]) == "--wind" || std::string(argv[i]) == "-w") && i + 1 < argc) {
-            wind = parseWindDirection(argv[++i]);
-        } else if (std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h") {
-            printUsage(argv[0]);
-            return 0;
-        }
-    }
-
-    std::cout << "Generando entorno " << ROWS << "x" << COLS << "..." << std::endl;
-    Matrix env = createEnvironment(ROWS, COLS, seed);
+    std::cout << "Generando entorno " << rows << "x" << cols << "..." << std::endl;
+    Matrix env = createEnvironment(rows, cols, seed);
 
     printEnvironmentStats(env);
-
     std::cout << "Viento: " << windDirectionName(wind) << std::endl;
 
     FireState fireState;
@@ -87,11 +93,51 @@ int main(int argc, char *argv[]) {
 
     auto fin = std::chrono::high_resolution_clock::now();
     auto duracion = std::chrono::duration_cast<std::chrono::milliseconds>(fin - inicio);
-
     std::cout << "Tiempo: " << duracion.count() << " ms" << std::endl;
 
     std::cout << "Abriendo ventana SDL2 con el estado final... (Cerrar con ESC o botón X)" << std::endl;
     showMatrixSDL(env);
+
+    return 0;
+}
+
+// ════════════════════════════════════════════════════════════════
+// Main
+// ════════════════════════════════════════════════════════════════
+int main(int argc, char *argv[]) {
+    int rows = 500;
+    int cols = 500;
+    unsigned int seed = (unsigned int)std::time(nullptr);
+    WindDirection wind = WindDirection::NONE;
+    bool batchMode = false;
+
+    // Parsear argumentos
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if ((arg == "--wind" || arg == "-w") && i + 1 < argc) {
+            wind = parseWindDirection(argv[++i]);
+        } else if (arg == "--rows" && i + 1 < argc) {
+            rows = std::stoi(argv[++i]);
+        } else if (arg == "--cols" && i + 1 < argc) {
+            cols = std::stoi(argv[++i]);
+        } else if (arg == "--batch") {
+            batchMode = true;
+        } else if (arg == "--help" || arg == "-h") {
+            printUsage(argv[0]);
+            return 0;
+        }
+    }
+
+    if (batchMode) {
+        return runBatch(rows, cols, seed, wind);
+    }
+
+    // Modo animado (defecto)
+    std::cout << "Grilla: " << rows << "x" << cols << "\n";
+    std::cout << "Viento: " << windDirectionName(wind) << "\n";
+
+    AnimatedView view(rows, cols, seed, wind);
+    view.run();
 
     return 0;
 }
