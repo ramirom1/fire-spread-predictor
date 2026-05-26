@@ -63,7 +63,7 @@ static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind, b
     std::mt19937 rng(seed);
 
     std::cout << "Generando entorno " << rows << "x" << cols << "..." << std::endl;
-    Matrix env = createEnvironment(rows, cols, seed);
+    Matrix env = createEnvironment(rows, cols, 123);
 
     printEnvironmentStats(env);
     std::cout << "Viento: " << windDirectionName(wind) << std::endl;
@@ -109,8 +109,8 @@ static int runBatch(int rows, int cols, unsigned int seed, WindDirection wind, b
 // Main
 // ════════════════════════════════════════════════════════════════
 int main(int argc, char *argv[]) {
-    int rows = 500;
-    int cols = 500;
+    int rows = 10000;
+    int cols = 10000;
     unsigned int seed = (unsigned int)std::time(nullptr);
     WindDirection wind = WindDirection::NONE;
     bool batchMode = false;
