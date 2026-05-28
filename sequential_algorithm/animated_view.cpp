@@ -25,7 +25,7 @@ Uint32 AnimatedView::cellToPixel(CellType type) {
 AnimatedView::AnimatedView(int rows, int cols, unsigned int seed,
                            WindDirection wind, int winWidth, int winHeight)
     : m_rows(rows), m_cols(cols)
-    , m_rng(seed), m_wind(wind)
+    , m_seed(seed), m_rng(seed), m_wind(wind)
     , m_generation(0), m_finished(false)
     , m_window(nullptr), m_renderer(nullptr), m_texture(nullptr)
     , m_winWidth(winWidth), m_winHeight(winHeight)
@@ -100,13 +100,15 @@ AnimatedView::~AnimatedView() {
 // Inicialización de la simulación
 // ════════════════════════════════════════════════════════════════
 void AnimatedView::initSimulation(unsigned int seed) {
+    m_seed = seed;
     m_env = createEnvironment(m_rows, m_cols, seed);
     m_fireState = FireState{};
     m_generation = 0;
     m_finished = false;
 
-    std::optional<Position> fire = igniteRandomCell(m_env, m_fireState, m_rng);
+    std::optional<Position> fire = chooseInitialFire(m_env, seed);
     if (fire) {
+        m_fireState.listaFuego1.push_back(*fire);
         std::cout << "Fuego inicial: (" << fire->row << ", " << fire->col << ")\n";
     } else {
         std::cerr << "No hay celdas combustibles.\n";
@@ -273,7 +275,7 @@ void AnimatedView::handleEvents() {
 // Paso de simulación
 // ════════════════════════════════════════════════════════════════
 void AnimatedView::stepSimulation() {
-    int newFires = advanceFire(m_env, m_fireState, m_rng, m_wind);
+    int newFires = advanceFire(m_env, m_fireState, m_seed, m_generation, m_wind);
     ++m_generation;
 
     if (countActiveFires(m_fireState) == 0) {

@@ -1,6 +1,8 @@
 #include "sequential_fire.h"
 
+#include <cstdint>
 #include <cstring>
+#include <random>
 
 // ============================================================
 // Parsing de dirección de viento desde string
@@ -111,8 +113,48 @@ static double ignitionProbabilityWithWind(
 }
 
 // ============================================================
+// Sorteo determinístico de ignición (idéntico a la versión paralela)
+// ============================================================
+static uint64_t splitMix64(uint64_t value) {
+    value += 0x9e3779b97f4a7c15ULL;
+    value = (value ^ (value >> 30)) * 0xbf58476d1ce4e5b9ULL;
+    value = (value ^ (value >> 27)) * 0x94d049bb133111ebULL;
+    return value ^ (value >> 31);
+}
+
+double ignitionDraw(unsigned int seed, int iteration, int globalRow, int globalCol) {
+    uint64_t value = seed;
+    value ^= splitMix64((uint64_t)(uint32_t)iteration);
+    value ^= splitMix64(((uint64_t)(uint32_t)globalRow << 32) | (uint32_t)globalCol);
+    value = splitMix64(value);
+
+    return (value >> 11) * (1.0 / 9007199254740992.0);
+}
+
+// ============================================================
 // Funciones de fuego
 // ============================================================
+std::optional<Position> chooseInitialFire(Matrix &mat, unsigned int seed) {
+    std::vector<Position> burnableCells;
+
+    for (int r = 0; r < (int)mat.size(); ++r) {
+        for (int c = 0; c < (int)mat[0].size(); ++c) {
+            if (canIgnite(mat[r][c]))
+                burnableCells.push_back({r, c});
+        }
+    }
+
+    if (burnableCells.empty())
+        return std::nullopt;
+
+    std::mt19937 rng(seed);
+    std::uniform_int_distribution<int> randomIndex(0, (int)burnableCells.size() - 1);
+    Position start = burnableCells[randomIndex(rng)];
+
+    mat[start.row][start.col] = BURNING;
+    return start;
+}
+
 std::optional<Position> igniteRandomCell(Matrix &mat, FireState &fireState, std::mt19937 &rng) {
     std::vector<Position> burnableCells;
 
@@ -154,10 +196,9 @@ static void markFireCandidates(
     }
 }
 
-int advanceFire(Matrix &mat, FireState &fireState, std::mt19937 &rng, WindDirection wind) {
+int advanceFire(Matrix &mat, FireState &fireState, unsigned int seed, int iteration, WindDirection wind) {
     int rows = (int)mat.size();
     int cols = (int)mat[0].size();
-    std::uniform_real_distribution<double> probability(0.0, 1.0);
 
     std::vector<std::vector<bool>> candidate(rows, std::vector<bool>(cols, false));
     std::vector<Position> candidates;
@@ -177,7 +218,7 @@ int advanceFire(Matrix &mat, FireState &fireState, std::mt19937 &rng, WindDirect
     for (const Position &cell : candidates) {
         double ignitionChance = ignitionProbabilityWithWind(mat, cell.row, cell.col, wind);
 
-        if (probability(rng) <= ignitionChance)
+        if (ignitionDraw(seed, iteration, cell.row, cell.col) <= ignitionChance)
             newFires.push_back(cell);
     }
 

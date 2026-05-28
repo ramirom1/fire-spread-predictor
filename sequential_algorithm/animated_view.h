@@ -32,6 +32,7 @@ private:
     // ── Simulación ────────────────────────────────────────────
     int            m_rows;
     int            m_cols;
+    unsigned int   m_seed;
     Matrix         m_env;
     FireState      m_fireState;
     std::mt19937   m_rng;

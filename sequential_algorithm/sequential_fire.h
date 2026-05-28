@@ -28,6 +28,14 @@ enum class WindDirection {
 
 WindDirection parseWindDirection(const char *str);
 
+// Sorteo determinístico de ignición (misma función que la versión paralela).
+// Devuelve un valor en [0, 1) basado en (seed, iteration, globalRow, globalCol).
+double ignitionDraw(unsigned int seed, int iteration, int globalRow, int globalCol);
+
+// Elige la celda inicial de fuego de forma determinística a partir de la seed.
+// Misma lógica que chooseInitialFire de la versión paralela.
+std::optional<Position> chooseInitialFire(Matrix &mat, unsigned int seed);
+
 std::optional<Position> igniteRandomCell(Matrix &mat, FireState &fireState, std::mt19937 &rng);
-int advanceFire(Matrix &mat, FireState &fireState, std::mt19937 &rng, WindDirection wind = WindDirection::NONE);
+int advanceFire(Matrix &mat, FireState &fireState, unsigned int seed, int iteration, WindDirection wind = WindDirection::NONE);
 int countActiveFires(const FireState &fireState);

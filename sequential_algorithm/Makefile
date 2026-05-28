@@ -13,9 +13,17 @@ $(TARGET): $(SOURCES) $(HEADERS)
 
 run: $(TARGET)
 ifdef WIND
+ifdef SEED
+	./$(TARGET) --wind $(WIND) --seed $(SEED)
+else
 	./$(TARGET) --wind $(WIND)
+endif
+else
+ifdef SEED
+	./$(TARGET) --seed $(SEED)
 else
 	./$(TARGET)
+endif
 endif
 
 clean:

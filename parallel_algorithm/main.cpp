@@ -188,12 +188,12 @@ int main(int argc, char *argv[]) {
         MPI_Allreduce(&localNewFires, &globalNewFires, 1, MPI_INT, MPI_SUM, cartComm);
         MPI_Allreduce(&localActiveFires, &globalActiveFires, 1, MPI_INT, MPI_SUM, cartComm);
 
-        if (rank == 0) {
-            std::cout << "Iteracion " << iteration
-                      << " | nuevos fuegos: " << globalNewFires
-                      << " | fuegos activos: " << globalActiveFires
-                      << "\n";
-        }
+        //if (rank == 0) {
+        //    std::cout << "Iteracion " << iteration
+        //              << " | nuevos fuegos: " << globalNewFires
+        //              << " | fuegos activos: " << globalActiveFires
+        //              << "\n";
+        //}
 
         if (globalActiveFires == 0) {
             if (rank == 0)
