@@ -17,15 +17,16 @@ COLS=15000
 ITERATIONS=100000
 SEED=43
 WIND=E
+FIRES=3
 
 echo "=== Fire Spread Predictor – Secuencial ==="
 echo "Nodo: $(hostname)"
 echo "Fecha: $(date)"
-echo "Parámetros: ${ROWS}x${COLS}, iter=${ITERATIONS}, seed=${SEED}, wind=${WIND}"
+echo "Parámetros: ${ROWS}x${COLS}, iter=${ITERATIONS}, seed=${SEED}, wind=${WIND}, fires=${FIRES}"
 echo "==========================================="
 
 cd sequential_algorithm
-./sequential_fire --rows $ROWS --cols $COLS --iterations $ITERATIONS --seed $SEED --wind $WIND --no-window
+./sequential_fire --rows $ROWS --cols $COLS --iterations $ITERATIONS --seed $SEED --wind $WIND --fires $FIRES --no-window
 
 echo ""
 echo "=== Fin: $(date) ==="

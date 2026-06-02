@@ -21,6 +21,7 @@ public:
     /// @param winHeight    Alto inicial de la ventana en píxeles
     AnimatedView(int rows, int cols, unsigned int seed,
                  WindDirection wind = WindDirection::NONE,
+                 int numFires = 1,
                  int winWidth = 1024, int winHeight = 768);
 
     ~AnimatedView();
@@ -38,6 +39,7 @@ private:
     std::mt19937   m_rng;
     WindDirection   m_wind;
     int            m_generation;
+    int            m_numFires;       ///< cantidad de focos iniciales
     bool           m_finished;      ///< true cuando el fuego se extinguió
 
     // ── Visualización ─────────────────────────────────────────

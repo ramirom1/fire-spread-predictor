@@ -23,10 +23,10 @@ Uint32 AnimatedView::cellToPixel(CellType type) {
 // Constructor / Destructor
 // ════════════════════════════════════════════════════════════════
 AnimatedView::AnimatedView(int rows, int cols, unsigned int seed,
-                           WindDirection wind, int winWidth, int winHeight)
+                           WindDirection wind, int numFires, int winWidth, int winHeight)
     : m_rows(rows), m_cols(cols)
     , m_seed(seed), m_rng(seed), m_wind(wind)
-    , m_generation(0), m_finished(false)
+    , m_generation(0), m_numFires(numFires), m_finished(false)
     , m_window(nullptr), m_renderer(nullptr), m_texture(nullptr)
     , m_winWidth(winWidth), m_winHeight(winHeight)
     , m_viewX(0), m_viewY(0)
@@ -106,10 +106,13 @@ void AnimatedView::initSimulation(unsigned int seed) {
     m_generation = 0;
     m_finished = false;
 
-    std::optional<Position> fire = chooseInitialFire(m_env, seed);
-    if (fire) {
-        m_fireState.listaFuego1.push_back(*fire);
-        std::cout << "Fuego inicial: (" << fire->row << ", " << fire->col << ")\n";
+    std::vector<Position> fires = chooseMultipleFires(m_env, seed, m_numFires);
+    if (!fires.empty()) {
+        for (const Position &fire : fires)
+            m_fireState.listaFuego1.push_back(fire);
+        std::cout << "Focos iniciales (" << fires.size() << "):\n";
+        for (int i = 0; i < (int)fires.size(); ++i)
+            std::cout << "  Foco " << (i + 1) << ": (" << fires[i].row << ", " << fires[i].col << ")\n";
     } else {
         std::cerr << "No hay celdas combustibles.\n";
         m_finished = true;

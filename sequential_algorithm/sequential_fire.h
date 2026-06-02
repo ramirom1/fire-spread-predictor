@@ -36,6 +36,10 @@ double ignitionDraw(unsigned int seed, int iteration, int globalRow, int globalC
 // Misma lógica que chooseInitialFire de la versión paralela.
 std::optional<Position> chooseInitialFire(Matrix &mat, unsigned int seed);
 
+// Elige múltiples celdas iniciales de fuego de forma determinística.
+// Usa sampling sin reemplazo para garantizar posiciones distintas.
+std::vector<Position> chooseMultipleFires(Matrix &mat, unsigned int seed, int count);
+
 std::optional<Position> igniteRandomCell(Matrix &mat, FireState &fireState, std::mt19937 &rng);
 int advanceFire(Matrix &mat, FireState &fireState, unsigned int seed, int iteration, WindDirection wind = WindDirection::NONE);
 int countActiveFires(const FireState &fireState);

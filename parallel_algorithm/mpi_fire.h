@@ -45,6 +45,7 @@ struct FireState {
 WindDirection parseWindDirection(const char *value);
 const char *windDirectionName(WindDirection wind);
 std::optional<Position> chooseInitialFire(Matrix &environment, unsigned int seed);
+std::vector<Position> chooseMultipleFires(Matrix &environment, unsigned int seed, int count);
 
 LocalBlock scatterEnvironment(
     const Matrix *environment,
@@ -61,6 +62,7 @@ Matrix gatherEnvironment(
 );
 
 int initializeLocalFire(LocalBlock &localBlock, FireState &fireState, Position initialFire);
+int initializeLocalFires(LocalBlock &localBlock, FireState &fireState, const std::vector<Position> &fires);
 int advanceParallelFire(
     LocalBlock &localBlock,
     FireState &fireState,

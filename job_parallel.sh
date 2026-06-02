@@ -18,17 +18,18 @@ COLS=15000
 ITERATIONS=100000
 SEED=43
 WIND=E
+FIRES=3
 NP=$SLURM_NTASKS
 
 echo "=== Fire Spread Predictor – Paralelo MPI ==="
 echo "Nodo: $(hostname)"
 echo "Fecha: $(date)"
 echo "Procesos MPI: ${NP}"
-echo "Parámetros: ${ROWS}x${COLS}, iter=${ITERATIONS}, seed=${SEED}, wind=${WIND}"
+echo "Parámetros: ${ROWS}x${COLS}, iter=${ITERATIONS}, seed=${SEED}, wind=${WIND}, fires=${FIRES}"
 echo "=============================================="
 
 cd parallel_algorithm
-mpirun -np $NP ./mpi_fire --rows $ROWS --cols $COLS --iterations $ITERATIONS --seed $SEED --wind $WIND --no-window
+mpirun -np $NP ./mpi_fire --rows $ROWS --cols $COLS --iterations $ITERATIONS --seed $SEED --wind $WIND --fires $FIRES --no-window
 
 echo ""
 echo "=== Fin: $(date) ==="

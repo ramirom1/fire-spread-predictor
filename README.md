@@ -53,7 +53,7 @@ Matrix createEnvironment(int rows, int cols, unsigned int seed = 0);
 
 ## Algoritmo de propagación del fuego
 
-Después de generar el entorno, el simulador elige aleatoriamente una casilla combustible (`Bosque` o `Ciudad`) y la marca como `Quemándose`.
+Después de generar el entorno, el simulador elige aleatoriamente una o más casillas combustibles (`Bosque` o `Ciudad`) y las marca como `Quemándose`. La cantidad de focos iniciales se controla con el parámetro `--fires <n>` (por defecto: 1). Los focos se eligen de forma determinística a partir de la semilla usando *Fisher-Yates partial shuffle*, garantizando posiciones distintas y reproducibilidad.
 
 El estado del fuego se guarda en tres listas:
 
@@ -159,6 +159,20 @@ make run WIND=W    # Viento hacia el oeste
 ```
 
 Sin el parámetro, la simulación corre sin viento (propagación isotrópica).
+
+#### Con múltiples focos de incendio
+
+El simulador acepta un parámetro `--fires` para indicar la cantidad de focos iniciales:
+
+```bash
+# Usando make en modo batch
+./sequential_fire --batch --fires 5
+
+# Combinado con viento
+./sequential_fire --batch --fires 3 --wind N --seed 42
+```
+
+Sin el parámetro, la simulación inicia con un único foco (comportamiento por defecto).
 
 #### Comandos del Makefile
 

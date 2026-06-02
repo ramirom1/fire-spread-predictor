@@ -155,6 +155,37 @@ std::optional<Position> chooseInitialFire(Matrix &mat, unsigned int seed) {
     return start;
 }
 
+std::vector<Position> chooseMultipleFires(Matrix &mat, unsigned int seed, int count) {
+    std::vector<Position> burnableCells;
+
+    for (int r = 0; r < (int)mat.size(); ++r) {
+        for (int c = 0; c < (int)mat[0].size(); ++c) {
+            if (canIgnite(mat[r][c]))
+                burnableCells.push_back({r, c});
+        }
+    }
+
+    std::vector<Position> fires;
+    if (burnableCells.empty() || count <= 0)
+        return fires;
+
+    count = std::min(count, (int)burnableCells.size());
+
+    // Fisher-Yates partial shuffle para elegir 'count' celdas distintas
+    std::mt19937 rng(seed);
+    for (int i = 0; i < count; ++i) {
+        std::uniform_int_distribution<int> dist(i, (int)burnableCells.size() - 1);
+        int j = dist(rng);
+        std::swap(burnableCells[i], burnableCells[j]);
+
+        Position &chosen = burnableCells[i];
+        mat[chosen.row][chosen.col] = BURNING;
+        fires.push_back(chosen);
+    }
+
+    return fires;
+}
+
 std::optional<Position> igniteRandomCell(Matrix &mat, FireState &fireState, std::mt19937 &rng) {
     std::vector<Position> burnableCells;
 

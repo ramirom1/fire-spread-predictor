@@ -383,6 +383,36 @@ std::optional<Position> chooseInitialFire(Matrix &environment, unsigned int seed
     return initialFire;
 }
 
+std::vector<Position> chooseMultipleFires(Matrix &environment, unsigned int seed, int count) {
+    std::vector<Position> burnableCells;
+    for (int r = 0; r < (int)environment.size(); ++r) {
+        for (int c = 0; c < (int)environment[0].size(); ++c) {
+            if (canIgnite(environment[r][c]))
+                burnableCells.push_back({r, c});
+        }
+    }
+
+    std::vector<Position> fires;
+    if (burnableCells.empty() || count <= 0)
+        return fires;
+
+    count = std::min(count, (int)burnableCells.size());
+
+    // Fisher-Yates partial shuffle para elegir 'count' celdas distintas
+    std::mt19937 rng(seed);
+    for (int i = 0; i < count; ++i) {
+        std::uniform_int_distribution<int> dist(i, (int)burnableCells.size() - 1);
+        int j = dist(rng);
+        std::swap(burnableCells[i], burnableCells[j]);
+
+        Position &chosen = burnableCells[i];
+        environment[chosen.row][chosen.col] = BURNING;
+        fires.push_back(chosen);
+    }
+
+    return fires;
+}
+
 LocalBlock scatterEnvironment(
     const Matrix *environment,
     int globalRows,
@@ -459,6 +489,13 @@ int initializeLocalFire(LocalBlock &localBlock, FireState &fireState, Position i
     localBlock.at(localFire.row, localFire.col) = BURNING;
     fireState.listaFuego1.push_back(localFire);
     return 1;
+}
+
+int initializeLocalFires(LocalBlock &localBlock, FireState &fireState, const std::vector<Position> &fires) {
+    int count = 0;
+    for (const Position &fire : fires)
+        count += initializeLocalFire(localBlock, fireState, fire);
+    return count;
 }
 
 int advanceParallelFire(

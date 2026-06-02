@@ -11,6 +11,7 @@ struct Options {
     int rows = 10000;
     int cols = 10000;
     int iterations = 50000;
+    int numFires = 1;
     unsigned int seed = 0;
     bool showWindow = true;
     bool help = false;
@@ -38,6 +39,8 @@ Options parseOptions(int argc, char *argv[]) {
             options.cols = parsePositiveInt(argv[++i], options.cols);
         } else if (arg == "--iterations" && i + 1 < argc) {
             options.iterations = parsePositiveInt(argv[++i], options.iterations);
+        } else if (arg == "--fires" && i + 1 < argc) {
+            options.numFires = parsePositiveInt(argv[++i], options.numFires);
         } else if (arg == "--seed" && i + 1 < argc) {
             options.seed = (unsigned int)std::strtoul(argv[++i], nullptr, 10);
         } else if (arg == "--no-window") {
@@ -54,7 +57,8 @@ void printUsage(const char *programName) {
     std::cout << "Uso: mpirun -np <procesos> " << programName << " [opciones]\n"
               << "  --rows <n>        Filas del mapa. Valor por defecto: 500\n"
               << "  --cols <n>        Columnas del mapa. Valor por defecto: 500\n"
-              << "  --iterations <n>  Iteraciones maximas. Valor por defecto: 200\n"
+              << "  --iterations <n>  Iteraciones maximas. Valor por defecto: 50000\n"
+              << "  --fires <n>       Cantidad de focos iniciales. Valor por defecto: 1\n"
               << "  --seed <n>        Semilla del mapa y decisiones de fuego\n"
               << "  --wind <N|S|E|W>  Direccion del viento; sin opcion corre sin viento\n"
               << "  --no-window       No abre SDL al final\n";
@@ -90,20 +94,22 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    int sharedOptions[5] = {
+    int sharedOptions[6] = {
         options.rows,
         options.cols,
         options.iterations,
+        options.numFires,
         options.showWindow ? 1 : 0,
         (int)options.wind
     };
-    MPI_Bcast(sharedOptions, 5, MPI_INT, 0, MPI_COMM_WORLD);
+    MPI_Bcast(sharedOptions, 6, MPI_INT, 0, MPI_COMM_WORLD);
     MPI_Bcast(&options.seed, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
     options.rows = sharedOptions[0];
     options.cols = sharedOptions[1];
     options.iterations = sharedOptions[2];
-    options.showWindow = sharedOptions[3] != 0;
-    options.wind = (WindDirection)sharedOptions[4];
+    options.numFires = sharedOptions[3];
+    options.showWindow = sharedOptions[4] != 0;
+    options.wind = (WindDirection)sharedOptions[5];
 
     int dims[2] = {};
     MPI_Dims_create(worldSize, 2, dims);
@@ -126,8 +132,8 @@ int main(int argc, char *argv[]) {
     }
 
     Matrix environment;
-    Position initialFire{-1, -1};
-    int hasInitialFire = 0;
+    std::vector<Position> initialFires;
+    int numFiresFound = 0;
 
     if (rank == 0) {
         std::cout << "Generando entorno " << options.rows << "x" << options.cols
@@ -135,11 +141,12 @@ int main(int argc, char *argv[]) {
         environment = createEnvironment(options.rows, options.cols, options.seed);
         printEnvironmentStats(environment);
 
-        std::optional<Position> start = chooseInitialFire(environment, options.seed);
-        if (start) {
-            initialFire = *start;
-            hasInitialFire = 1;
-            std::cout << "Fuego inicial: (" << initialFire.row << ", " << initialFire.col << ")\n";
+        initialFires = chooseMultipleFires(environment, options.seed, options.numFires);
+        numFiresFound = (int)initialFires.size();
+        if (numFiresFound > 0) {
+            std::cout << "Focos iniciales (" << numFiresFound << "):\n";
+            for (int i = 0; i < numFiresFound; ++i)
+                std::cout << "  Foco " << (i + 1) << ": (" << initialFires[i].row << ", " << initialFires[i].col << ")\n";
             std::cout << "Viento: " << windDirectionName(options.wind) << "\n";
             std::cout << "Bloques MPI: " << dims[0] << "x" << dims[1] << "\n";
         } else {
@@ -147,15 +154,29 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    MPI_Bcast(&hasInitialFire, 1, MPI_INT, 0, cartComm);
-    int initialCoordinates[2] = {initialFire.row, initialFire.col};
-    MPI_Bcast(initialCoordinates, 2, MPI_INT, 0, cartComm);
-    initialFire = {initialCoordinates[0], initialCoordinates[1]};
+    MPI_Bcast(&numFiresFound, 1, MPI_INT, 0, cartComm);
 
-    if (!hasInitialFire) {
+    if (numFiresFound == 0) {
         MPI_Comm_free(&cartComm);
         MPI_Finalize();
         return 1;
+    }
+
+    // Broadcast de todas las coordenadas de fuego
+    std::vector<int> fireCoords(2 * numFiresFound);
+    if (rank == 0) {
+        for (int i = 0; i < numFiresFound; ++i) {
+            fireCoords[2 * i]     = initialFires[i].row;
+            fireCoords[2 * i + 1] = initialFires[i].col;
+        }
+    }
+    MPI_Bcast(fireCoords.data(), 2 * numFiresFound, MPI_INT, 0, cartComm);
+
+    if (rank != 0) {
+        initialFires.resize(numFiresFound);
+        for (int i = 0; i < numFiresFound; ++i) {
+            initialFires[i] = {fireCoords[2 * i], fireCoords[2 * i + 1]};
+        }
     }
 
     LocalBlock localBlock = scatterEnvironment(
@@ -165,7 +186,7 @@ int main(int argc, char *argv[]) {
         cartComm
     );
     FireState fireState;
-    initializeLocalFire(localBlock, fireState, initialFire);
+    initializeLocalFires(localBlock, fireState, initialFires);
 
     if (rank == 0)
         std::cout << "Simulando " << options.iterations << " iteraciones..." << std::endl;

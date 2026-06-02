@@ -14,6 +14,7 @@ static void printUsage(const char *programName) {
               << "  --rows <n>         Filas de la grilla (defecto: 10000)\n"
               << "  --cols <n>         Columnas de la grilla (defecto: 10000)\n"
               << "  --iterations <n>   Iteraciones máximas (defecto: 50000)\n"
+              << "  --fires <n>        Cantidad de focos iniciales (defecto: 1)\n"
               << "  --seed <n>         Semilla para reproducibilidad (defecto: time)\n"
               << "  --wind <N|S|E|W>   Dirección del viento (defecto: sin viento)\n"
               << "  --no-window        No abre ventana SDL al final (modo batch)\n"
@@ -60,7 +61,7 @@ static const char* windDirectionName(WindDirection wind) {
 // ════════════════════════════════════════════════════════════════
 // Modo batch (comportamiento original)
 // ════════════════════════════════════════════════════════════════
-static int runBatch(int rows, int cols, int iterations, unsigned int seed, WindDirection wind, bool showGui) {
+static int runBatch(int rows, int cols, int iterations, int numFires, unsigned int seed, WindDirection wind, bool showGui) {
 
     std::cout << "Generando entorno " << rows << "x" << cols << " (seed=" << seed << ")..." << std::endl;
     Matrix env = createEnvironment(rows, cols, seed);
@@ -69,14 +70,17 @@ static int runBatch(int rows, int cols, int iterations, unsigned int seed, WindD
     std::cout << "Viento: " << windDirectionName(wind) << std::endl;
 
     FireState fireState;
-    std::optional<Position> initialFire = chooseInitialFire(env, seed);
-    if (!initialFire) {
+    std::vector<Position> initialFires = chooseMultipleFires(env, seed, numFires);
+    if (initialFires.empty()) {
         std::cerr << "No hay casillas combustibles para iniciar el fuego." << std::endl;
         return 1;
     }
-    fireState.listaFuego1.push_back(*initialFire);
+    for (const Position &fire : initialFires)
+        fireState.listaFuego1.push_back(fire);
 
-    std::cout << "Fuego inicial: (" << initialFire->row << ", " << initialFire->col << ")\n";
+    std::cout << "Focos iniciales (" << initialFires.size() << "):\n";
+    for (int i = 0; i < (int)initialFires.size(); ++i)
+        std::cout << "  Foco " << (i + 1) << ": (" << initialFires[i].row << ", " << initialFires[i].col << ")\n";
     std::cout << "Simulando " << iterations << " iteraciones..." << std::endl;
 
     auto inicio = std::chrono::high_resolution_clock::now();
@@ -113,6 +117,7 @@ int main(int argc, char *argv[]) {
     int rows = 10000;
     int cols = 10000;
     int iterations = 50000;
+    int numFires = 1;
     unsigned int seed = (unsigned int)std::time(nullptr);
     WindDirection wind = WindDirection::NONE;
     bool batchMode = false;
@@ -129,6 +134,8 @@ int main(int argc, char *argv[]) {
             cols = std::stoi(argv[++i]);
         } else if (arg == "--iterations" && i + 1 < argc) {
             iterations = std::stoi(argv[++i]);
+        } else if (arg == "--fires" && i + 1 < argc) {
+            numFires = std::stoi(argv[++i]);
         } else if (arg == "--seed" && i + 1 < argc) {
             seed = (unsigned int)std::stoul(argv[++i]);
         } else if (arg == "--batch") {
@@ -143,14 +150,14 @@ int main(int argc, char *argv[]) {
     }
 
     if (batchMode) {
-        return runBatch(rows, cols, iterations, seed, wind, !noGui);
+        return runBatch(rows, cols, iterations, numFires, seed, wind, !noGui);
     }
 
     // Modo animado (defecto)
     std::cout << "Grilla: " << rows << "x" << cols << " (seed=" << seed << ")\n";
     std::cout << "Viento: " << windDirectionName(wind) << "\n";
 
-    AnimatedView view(rows, cols, seed, wind);
+    AnimatedView view(rows, cols, seed, wind, numFires);
     view.run();
 
     return 0;
