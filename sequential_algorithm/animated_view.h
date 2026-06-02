@@ -1,5 +1,7 @@
 #pragma once
 
+#ifndef NO_SDL
+
 #include "sequential_fire.h"
 #include "../matrix_creator/environment.h"
 
@@ -87,3 +89,5 @@ private:
     /// Convierte un CellType a color RGBX8888.
     static Uint32 cellToPixel(CellType type);
 };
+
+#endif // NO_SDL

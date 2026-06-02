@@ -4,7 +4,9 @@
 #include <ctime>
 #include <iostream>
 #include <random>
+#ifndef NO_SDL
 #include <SDL2/SDL.h>
+#endif
 
 std::vector<std::pair<int, int>> neighbors4(int row, int col, int rows, int cols) {
     std::vector<std::pair<int, int>> res;
@@ -188,6 +190,7 @@ Matrix createEnvironment(int rows, int cols, unsigned int seed) {
     return mat;
 }
 
+#ifndef NO_SDL
 struct Color {
     Uint8 r;
     Uint8 g;
@@ -272,3 +275,8 @@ void showMatrixSDL(const Matrix &mat, int cellSize) {
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
+#else
+void showMatrixSDL(const Matrix &, int) {
+    // SDL2 no disponible (compilado con -DNO_SDL)
+}
+#endif

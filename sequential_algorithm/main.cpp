@@ -1,5 +1,7 @@
 #include "sequential_fire.h"
+#ifndef NO_SDL
 #include "animated_view.h"
+#endif
 
 #include <chrono>
 #include <ctime>
@@ -153,12 +155,18 @@ int main(int argc, char *argv[]) {
         return runBatch(rows, cols, iterations, numFires, seed, wind, !noGui);
     }
 
+#ifndef NO_SDL
     // Modo animado (defecto)
     std::cout << "Grilla: " << rows << "x" << cols << " (seed=" << seed << ")\n";
     std::cout << "Viento: " << windDirectionName(wind) << "\n";
 
     AnimatedView view(rows, cols, seed, wind, numFires);
     view.run();
+#else
+    std::cerr << "Modo animado no disponible (compilado sin SDL2).\n"
+              << "Usa --batch o --no-window.\n";
+    return 1;
+#endif
 
     return 0;
 }

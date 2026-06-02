@@ -17,7 +17,10 @@ run: $(TARGET)
 run-headless: $(TARGET)
 	mpirun -np 10 ./$(TARGET) --no-window
 
+cluster:
+	$(CXX) $(CXXFLAGS) -DNO_SDL -o $(TARGET) $(SOURCES)
+
 clean:
 	rm -f $(TARGET)
 
-.PHONY: all run run-headless clean
+.PHONY: all run run-headless clean cluster

@@ -1,3 +1,4 @@
+#ifndef NO_SDL
 #include "animated_view.h"
 
 #include <algorithm>
@@ -416,3 +417,4 @@ void AnimatedView::run() {
         render();
     }
 }
+#endif // NO_SDL

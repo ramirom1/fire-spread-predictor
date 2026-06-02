@@ -26,7 +26,10 @@ else
 endif
 endif
 
+cluster:
+	$(CXX) $(CXXFLAGS) -DNO_SDL -o $(TARGET) $(SOURCES)
+
 clean:
 	rm -f $(TARGET)
 
-.PHONY: all run clean
+.PHONY: all run clean cluster
