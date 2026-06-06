@@ -1,0 +1,170 @@
+=== Experimentos Paralelos (NP=8) ===
+Nodo: bdw06.bdw.ccad.unc.edu.ar
+Fecha: Tue Jun  2 17:53:45 -03 2026
+----------------------------------------------
+Tamaño: 10000x10000 | Procesos: 8 | Focos: 1
+Inicio: Tue Jun  2 17:53:45 -03 2026
+Generando entorno 10000x10000 para 8 procesos...
+Agua:   8213337 (8.21334%)
+Bosque: 81538395 (81.5384%)
+Ciudad: 10248268 (10.2483%)
+Focos iniciales (1):
+  Foco 1: (5312, 7569)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 41798.
+Tiempo paralelo: 23234.3 ms
+Fin: Tue Jun  2 17:54:58 -03 2026
+----------------------------------------------
+Tamaño: 10000x10000 | Procesos: 8 | Focos: 3
+Inicio: Tue Jun  2 17:54:58 -03 2026
+Generando entorno 10000x10000 para 8 procesos...
+Agua:   8213337 (8.21334%)
+Bosque: 81538395 (81.5384%)
+Ciudad: 10248268 (10.2483%)
+Focos iniciales (3):
+  Foco 1: (5312, 7569)
+  Foco 2: (7609, 2212)
+  Foco 3: (8704, 3581)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 21272.
+Tiempo paralelo: 19248 ms
+Fin: Tue Jun  2 17:56:08 -03 2026
+----------------------------------------------
+Tamaño: 10000x10000 | Procesos: 8 | Focos: 5
+Inicio: Tue Jun  2 17:56:08 -03 2026
+Generando entorno 10000x10000 para 8 procesos...
+Agua:   8213337 (8.21334%)
+Bosque: 81538395 (81.5384%)
+Ciudad: 10248268 (10.2483%)
+Focos iniciales (5):
+  Foco 1: (5312, 7569)
+  Foco 2: (7609, 2212)
+  Foco 3: (8704, 3581)
+  Foco 4: (9553, 3510)
+  Foco 5: (6772, 2582)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 20901.
+Tiempo paralelo: 18354.9 ms
+Fin: Tue Jun  2 17:57:17 -03 2026
+----------------------------------------------
+Tamaño: 15000x15000 | Procesos: 8 | Focos: 1
+Inicio: Tue Jun  2 17:57:17 -03 2026
+Generando entorno 15000x15000 para 8 procesos...
+Agua:   18480000 (8.21333%)
+Bosque: 183461397 (81.5384%)
+Ciudad: 23058603 (10.2483%)
+Focos iniciales (1):
+  Foco 1: (7969, 317)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 27007.
+Tiempo paralelo: 39179.3 ms
+Fin: Tue Jun  2 17:59:51 -03 2026
+----------------------------------------------
+Tamaño: 15000x15000 | Procesos: 8 | Focos: 3
+Inicio: Tue Jun  2 17:59:51 -03 2026
+Generando entorno 15000x15000 para 8 procesos...
+Agua:   18480000 (8.21333%)
+Bosque: 183461397 (81.5384%)
+Ciudad: 23058603 (10.2483%)
+Focos iniciales (3):
+  Foco 1: (7969, 317)
+  Foco 2: (11414, 871)
+  Foco 3: (13056, 7986)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 26084.
+Tiempo paralelo: 43034.3 ms
+Fin: Tue Jun  2 18:02:28 -03 2026
+----------------------------------------------
+Tamaño: 15000x15000 | Procesos: 8 | Focos: 5
+Inicio: Tue Jun  2 18:02:28 -03 2026
+Generando entorno 15000x15000 para 8 procesos...
+Agua:   18480000 (8.21333%)
+Bosque: 183461397 (81.5384%)
+Ciudad: 23058603 (10.2483%)
+Focos iniciales (5):
+  Foco 1: (7969, 317)
+  Foco 2: (11414, 871)
+  Foco 3: (13056, 7986)
+  Foco 4: (14330, 329)
+  Foco 5: (10158, 6196)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 25632.
+Tiempo paralelo: 44270.2 ms
+Fin: Tue Jun  2 18:05:06 -03 2026
+----------------------------------------------
+Tamaño: 20000x20000 | Procesos: 8 | Focos: 1
+Inicio: Tue Jun  2 18:05:06 -03 2026
+Generando entorno 20000x20000 para 8 procesos...
+Agua:   32853332 (8.21333%)
+Bosque: 326153596 (81.5384%)
+Ciudad: 40993072 (10.2483%)
+Focos iniciales (1):
+  Foco 1: (10625, 5701)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 38625.
+Tiempo paralelo: 60394.4 ms
+Fin: Tue Jun  2 18:09:29 -03 2026
+----------------------------------------------
+Tamaño: 20000x20000 | Procesos: 8 | Focos: 3
+Inicio: Tue Jun  2 18:09:29 -03 2026
+Generando entorno 20000x20000 para 8 procesos...
+Agua:   32853332 (8.21333%)
+Bosque: 326153596 (81.5384%)
+Ciudad: 40993072 (10.2483%)
+Focos iniciales (3):
+  Foco 1: (10625, 5701)
+  Foco 2: (15218, 17909)
+  Foco 3: (17408, 14140)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 38625.
+Tiempo paralelo: 71168.3 ms
+Fin: Tue Jun  2 18:14:04 -03 2026
+----------------------------------------------
+Tamaño: 20000x20000 | Procesos: 8 | Focos: 5
+Inicio: Tue Jun  2 18:14:04 -03 2026
+Generando entorno 20000x20000 para 8 procesos...
+Agua:   32853332 (8.21333%)
+Bosque: 326153596 (81.5384%)
+Ciudad: 40993072 (10.2483%)
+Focos iniciales (5):
+  Foco 1: (10625, 5701)
+  Foco 2: (15218, 17909)
+  Foco 3: (17408, 14140)
+  Foco 4: (19106, 13861)
+  Foco 5: (13544, 12042)
+Viento: Este
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 38625.
+Tiempo paralelo: 73212.4 ms
+Fin: Tue Jun  2 18:18:41 -03 2026
+=== Todos finalizados ===
+
+Job Metrics:
+Job ID: 291538
+Cluster: bdw
+User/Group: cursoppyd20/cursoppyd20
+State: COMPLETED (exit code 0)
+Nodes: 1
+Cores per node: 8
+CPU Utilized: 03:16:48
+CPU Efficiency: 98.53% of 03:19:44 core-walltime
+Job Wall-clock time: 00:24:58
+Memory Utilized: 8.60 GB
+Memory Efficiency: 28.20% of 30.50 GB (3.81 GB/core)
