@@ -15,13 +15,13 @@ Durante la simulacion todos los ranks computan:
 
 1. El programa inicia MPI con `MPI_Init` y cada proceso obtiene su `rank`.
 
-2. Se leen los parametros de ejecucion: filas, columnas, iteraciones, semilla, viento y si se abre o no la ventana SDL. El `rank 0` difunde esa configuracion al resto de procesos con `MPI_Bcast`.
+2. Se leen los parametros de ejecucion: filas, columnas, iteraciones, cantidad de focos, semilla, viento, metricas y si se abre o no la ventana SDL. El `rank 0` difunde esa configuracion al resto de procesos con `MPI_Bcast`.
 
 3. MPI calcula una grilla 2D de procesos con `MPI_Dims_create` y crea una topologia cartesiana con `MPI_Cart_create`. Por ejemplo, con 4 procesos normalmente se obtiene una grilla `2x2`.
 
 4. El `rank 0` genera la matriz completa llamando a `createEnvironment(rows, cols, seed)`. Esa matriz inicial contiene `WATER`, `FOREST` y `CITY`.
 
-5. El `rank 0` elige una celda combustible inicial, la marca como `BURNING` y comparte sus coordenadas globales con todos los procesos.
+5. El `rank 0` elige una o mas celdas combustibles iniciales, las marca como `BURNING` y comparte sus coordenadas globales con todos los procesos.
 
 6. El `rank 0` divide la matriz en bloques 2D fijos. Cada proceso recibe un `LocalBlock` con su porcion de la matriz, su offset global y sus dimensiones locales.
 
@@ -45,7 +45,9 @@ Durante la simulacion todos los ranks computan:
 
 16. Si la cantidad global de fuegos activos es `0`, la simulacion termina. Si no, se avanza a la siguiente iteracion.
 
-17. Al finalizar, cada proceso envia su bloque final al `rank 0`. El `rank 0` reconstruye la matriz completa y, si no se uso `--no-window`, la muestra con SDL.
+17. Al finalizar, si se va a abrir la ventana SDL, cada proceso envia su bloque final al `rank 0`. El `rank 0` reconstruye la matriz completa y la muestra. Si se usa `--no-window`, se omite esta recoleccion final para no contaminar la medicion con transferencia de matriz.
+
+18. Si se usa `--metrics`, el programa imprime un resumen por rank con tiempos promedio, candidatos evaluados, fuegos generados y desbalance de carga.
 
 La version actual usa bloques fijos: si se ejecuta con `-np 10`, la matriz se divide en 10 bloques al inicio y esos bloques no se reasignan durante la simulacion.
 
@@ -73,13 +75,21 @@ Opciones:
 --rows <n>
 --cols <n>
 --iterations <n>
+--fires <n>
 --seed <n>
 --wind <N|S|E|W>
 --no-window
+--metrics
 ```
 
 Ejemplo reproducible:
 
 ```bash
-mpirun -np 4 ./mpi_fire --rows 500 --cols 500 --iterations 200 --seed 123 --wind E
+mpirun -np 4 ./mpi_fire --rows 500 --cols 500 --iterations 200 --fires 3 --seed 123 --wind E
+```
+
+Ejemplo con metricas por rank:
+
+```bash
+mpirun -np 4 ./mpi_fire --rows 1000 --cols 1000 --iterations 500 --fires 3 --seed 43 --no-window --metrics
 ```

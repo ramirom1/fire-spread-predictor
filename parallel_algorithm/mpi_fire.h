@@ -42,6 +42,15 @@ struct FireState {
     std::vector<Position> listaFuego3;
 };
 
+struct ParallelStepMetrics {
+    long long candidatesEvaluated = 0;
+    long long newFires = 0;
+    double haloSeconds = 0.0;
+    double candidateSeconds = 0.0;
+    double ignitionSeconds = 0.0;
+    double updateSeconds = 0.0;
+};
+
 WindDirection parseWindDirection(const char *value);
 const char *windDirectionName(WindDirection wind);
 std::optional<Position> chooseInitialFire(Matrix &environment, unsigned int seed);
@@ -69,6 +78,7 @@ int advanceParallelFire(
     unsigned int seed,
     int iteration,
     WindDirection wind,
-    MPI_Comm cartComm
+    MPI_Comm cartComm,
+    ParallelStepMetrics *metrics = nullptr
 );
 int countActiveFires(const FireState &fireState);

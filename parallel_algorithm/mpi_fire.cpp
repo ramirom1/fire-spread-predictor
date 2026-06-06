@@ -504,10 +504,17 @@ int advanceParallelFire(
     unsigned int seed,
     int iteration,
     WindDirection wind,
-    MPI_Comm cartComm
+    MPI_Comm cartComm,
+    ParallelStepMetrics *metrics
 ) {
-    Halos halos = exchangeHalos(localBlock, cartComm);
+    if (metrics)
+        *metrics = ParallelStepMetrics{};
 
+    double haloStart = MPI_Wtime();
+    Halos halos = exchangeHalos(localBlock, cartComm);
+    double haloEnd = MPI_Wtime();
+
+    double candidateStart = MPI_Wtime();
     std::unordered_set<int64_t> visited;
     std::vector<Position> candidates;
     candidates.reserve(
@@ -524,7 +531,9 @@ int advanceParallelFire(
     markLocalCandidates(localBlock, fireState.listaFuego2, visited, candidates);
     markLocalCandidates(localBlock, fireState.listaFuego3, visited, candidates);
     markHaloCandidates(localBlock, halos, visited, candidates);
+    double candidateEnd = MPI_Wtime();
 
+    double ignitionStart = MPI_Wtime();
     std::vector<Position> newFires;
     for (const Position &cell : candidates) {
         double chance = ignitionProbability(localBlock, halos, cell, wind);
@@ -533,7 +542,9 @@ int advanceParallelFire(
         if (ignitionDraw(seed, iteration, globalRow, globalCol) <= chance)
             newFires.push_back(cell);
     }
+    double ignitionEnd = MPI_Wtime();
 
+    double updateStart = MPI_Wtime();
     for (const Position &cell : fireState.listaFuego3)
         localBlock.at(cell.row, cell.col) = ASH;
 
@@ -543,6 +554,16 @@ int advanceParallelFire(
 
     for (const Position &cell : fireState.listaFuego1)
         localBlock.at(cell.row, cell.col) = BURNING;
+    double updateEnd = MPI_Wtime();
+
+    if (metrics) {
+        metrics->candidatesEvaluated = (long long)candidates.size();
+        metrics->newFires = (long long)fireState.listaFuego1.size();
+        metrics->haloSeconds = haloEnd - haloStart;
+        metrics->candidateSeconds = candidateEnd - candidateStart;
+        metrics->ignitionSeconds = ignitionEnd - ignitionStart;
+        metrics->updateSeconds = updateEnd - updateStart;
+    }
 
     return (int)fireState.listaFuego1.size();
 }
