@@ -1,44 +1,44 @@
 === Experimentos Secuenciales (NP=1) ===
 Nodo: bdw06.bdw.ccad.unc.edu.ar
-Fecha: Tue Jun  2 17:53:36 -03 2026
+Fecha: Sun Jun  7 17:19:55 -03 2026
 ----------------------------------------------
 Tamaño: 10000x10000 | Procesos: 1 | Focos: 1
-Inicio: Tue Jun  2 17:53:36 -03 2026
+Inicio: Sun Jun  7 17:19:55 -03 2026
 Generando entorno 10000x10000 (seed=67)...
 Agua:   8213337 (8.21334%)
 Bosque: 81538395 (81.5384%)
 Ciudad: 10248268 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (1):
   Foco 1: (5312, 7569)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 41798.
-Tiempo: 179921 ms
-Fin: Tue Jun  2 17:57:23 -03 2026
+El fuego se extinguio en la iteracion 15033.
+Tiempo: 104148 ms
+Fin: Sun Jun  7 17:22:26 -03 2026
 ----------------------------------------------
 Tamaño: 10000x10000 | Procesos: 1 | Focos: 3
-Inicio: Tue Jun  2 17:57:23 -03 2026
+Inicio: Sun Jun  7 17:22:26 -03 2026
 Generando entorno 10000x10000 (seed=67)...
 Agua:   8213337 (8.21334%)
 Bosque: 81538395 (81.5384%)
 Ciudad: 10248268 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (3):
   Foco 1: (5312, 7569)
   Foco 2: (7609, 2212)
   Foco 3: (8704, 3581)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 21272.
-Tiempo: 142998 ms
-Fin: Tue Jun  2 18:00:33 -03 2026
+El fuego se extinguio en la iteracion 12455.
+Tiempo: 100334 ms
+Fin: Sun Jun  7 17:24:53 -03 2026
 ----------------------------------------------
 Tamaño: 10000x10000 | Procesos: 1 | Focos: 5
-Inicio: Tue Jun  2 18:00:33 -03 2026
+Inicio: Sun Jun  7 17:24:53 -03 2026
 Generando entorno 10000x10000 (seed=67)...
 Agua:   8213337 (8.21334%)
 Bosque: 81538395 (81.5384%)
 Ciudad: 10248268 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (5):
   Foco 1: (5312, 7569)
   Foco 2: (7609, 2212)
@@ -46,47 +46,47 @@ Focos iniciales (5):
   Foco 4: (9553, 3510)
   Foco 5: (6772, 2582)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 20901.
-Tiempo: 144665 ms
-Fin: Tue Jun  2 18:03:44 -03 2026
+El fuego se extinguio en la iteracion 11505.
+Tiempo: 99656 ms
+Fin: Sun Jun  7 17:27:19 -03 2026
 ----------------------------------------------
 Tamaño: 15000x15000 | Procesos: 1 | Focos: 1
-Inicio: Tue Jun  2 18:03:44 -03 2026
+Inicio: Sun Jun  7 17:27:19 -03 2026
 Generando entorno 15000x15000 (seed=67)...
 Agua:   18480000 (8.21333%)
 Bosque: 183461397 (81.5384%)
 Ciudad: 23058603 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (1):
   Foco 1: (7969, 317)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 27007.
-Tiempo: 416053 ms
-Fin: Tue Jun  2 18:12:27 -03 2026
+El fuego se extinguio en la iteracion 26906.
+Tiempo: 308017 ms
+Fin: Sun Jun  7 17:34:12 -03 2026
 ----------------------------------------------
 Tamaño: 15000x15000 | Procesos: 1 | Focos: 3
-Inicio: Tue Jun  2 18:12:27 -03 2026
+Inicio: Sun Jun  7 17:34:12 -03 2026
 Generando entorno 15000x15000 (seed=67)...
 Agua:   18480000 (8.21333%)
 Bosque: 183461397 (81.5384%)
 Ciudad: 23058603 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (3):
   Foco 1: (7969, 317)
   Foco 2: (11414, 871)
   Foco 3: (13056, 7986)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 26084.
-Tiempo: 404277 ms
-Fin: Tue Jun  2 18:20:58 -03 2026
+El fuego se extinguio en la iteracion 25497.
+Tiempo: 279798 ms
+Fin: Sun Jun  7 17:40:36 -03 2026
 ----------------------------------------------
 Tamaño: 15000x15000 | Procesos: 1 | Focos: 5
-Inicio: Tue Jun  2 18:20:58 -03 2026
+Inicio: Sun Jun  7 17:40:36 -03 2026
 Generando entorno 15000x15000 (seed=67)...
 Agua:   18480000 (8.21333%)
 Bosque: 183461397 (81.5384%)
 Ciudad: 23058603 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (5):
   Foco 1: (7969, 317)
   Foco 2: (11414, 871)
@@ -94,45 +94,66 @@ Focos iniciales (5):
   Foco 4: (14330, 329)
   Foco 5: (10158, 6196)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 25632.
-Tiempo: 354356 ms
-Fin: Tue Jun  2 18:28:39 -03 2026
+El fuego se extinguio en la iteracion 23453.
+Tiempo: 269076 ms
+Fin: Sun Jun  7 17:46:50 -03 2026
 ----------------------------------------------
 Tamaño: 20000x20000 | Procesos: 1 | Focos: 1
-Inicio: Tue Jun  2 18:28:39 -03 2026
+Inicio: Sun Jun  7 17:46:50 -03 2026
 Generando entorno 20000x20000 (seed=67)...
 Agua:   32853332 (8.21333%)
 Bosque: 326153596 (81.5384%)
 Ciudad: 40993072 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (1):
   Foco 1: (10625, 5701)
 Simulando 100000 iteraciones...
-El fuego se extinguio en la iteracion 38625.
-Tiempo: 897012 ms
-Fin: Tue Jun  2 18:46:45 -03 2026
+El fuego se extinguio en la iteracion 30102.
+Tiempo: 741801 ms
+Fin: Sun Jun  7 18:02:21 -03 2026
 ----------------------------------------------
 Tamaño: 20000x20000 | Procesos: 1 | Focos: 3
-Inicio: Tue Jun  2 18:46:45 -03 2026
+Inicio: Sun Jun  7 18:02:21 -03 2026
 Generando entorno 20000x20000 (seed=67)...
 Agua:   32853332 (8.21333%)
 Bosque: 326153596 (81.5384%)
 Ciudad: 40993072 (10.2483%)
-Viento: Este
+Viento: Sin viento
 Focos iniciales (3):
   Foco 1: (10625, 5701)
   Foco 2: (15218, 17909)
   Foco 3: (17408, 14140)
 Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 24184.
+Tiempo: 676599 ms
+Fin: Sun Jun  7 18:16:47 -03 2026
+----------------------------------------------
+Tamaño: 20000x20000 | Procesos: 1 | Focos: 5
+Inicio: Sun Jun  7 18:34:41 -03 2026
+Generando entorno 20000x20000 (seed=67)...
+Agua:   32853332 (8.21333%)
+Bosque: 326153596 (81.5384%)
+Ciudad: 40993072 (10.2483%)
+Viento: Sin viento
+Focos iniciales (5):
+  Foco 1: (10625, 5701)
+  Foco 2: (15218, 17909)
+  Foco 3: (17408, 14140)
+  Foco 4: (19106, 13861)
+  Foco 5: (13544, 12042)
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 23814.
+Tiempo: 664370 ms
+Fin: Sun Jun  7 18:48:56 -03 2026
 
 Job Metrics:
-Job ID: 291535
+Job ID: 292185
 Cluster: bdw
-User/Group: cursoppyd20/cursoppyd20
+User/Group: cursoppyd21/cursoppyd21
 State: TIMEOUT (exit code 0)
 Cores: 1
-CPU Utilized: 00:59:56
-CPU Efficiency: 99.58% of 01:00:11 core-walltime
-Job Wall-clock time: 01:00:11
+CPU Utilized: 01:00:03
+CPU Efficiency: 99.53% of 01:00:20 core-walltime
+Job Wall-clock time: 01:00:20
 Memory Utilized: 8.49 GB
-Memory Efficiency: 222.80% of 3.81 GB (3.81 GB/core)
+Memory Efficiency: 222.78% of 3.81 GB (3.81 GB/core)

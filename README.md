@@ -273,7 +273,7 @@ sbatch job_np4.sh   # Ejecuta las 9 combinaciones en paralelo con 4 procesos
 sbatch job_np8.sh   # Ejecuta las 9 combinaciones en paralelo con 8 procesos
 ```
 
-Los parámetros fijos (seed=43, iteraciones=100000, viento=E) están configurados como variables dentro de cada script.
+Los parámetros fijos (seed=67, iteraciones=100000, sin viento) están configurados como variables dentro de cada script para garantizar simulaciones isotrópicas y determinísticas.
 
 ### Compilación en cluster
 
@@ -289,3 +289,12 @@ Módulo requerido en el cluster (se carga automáticamente en los scripts):
 | `build-essential` (g++) | Compilación C++17 | Sí (`gcc/12.2.0`) |
 | `libsdl2-dev` | Visualización gráfica | No (se compila con `-DNO_SDL`) |
 | `libopenmpi-dev` / `openmpi-bin` | Ejecución paralela MPI | Sí (`openmpi/4.1.4`) |
+
+## Análisis y Gráficos
+
+El repositorio incluye herramientas desarrolladas en Python para procesar las métricas de ejecución emitidas por el cluster y transformarlas en gráficos de análisis de rendimiento.
+
+Para generar los gráficos, es necesario contar con `matplotlib` (`pip install matplotlib`).
+
+- `generar_graficos.py`: Lee el archivo CSV recopilatorio y genera gráficos de línea detallando el **Rendimiento**, **Speedup** y **Eficiencia** para cada tamaño de matriz, comparando el impacto de múltiples focos. Los gráficos se exportan a la carpeta `graficos/`.
+- `plot_profiling.py`: Extrae las métricas granulares desde los `.out` del cluster (`metrics_10k_p8_f1.out` y `metrics_10k_p8_f5.out`) y genera un gráfico de barras apiladas (`grafico_barras_profiling.png`) para evidenciar el cuello de botella generado por la sincronización en la barrera `MPI_Allreduce`.

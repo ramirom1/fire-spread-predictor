@@ -8,9 +8,8 @@
 
 module load openmpi/4.1.4
 
-SEED=43
+SEED=67
 ITERATIONS=100000
-WIND=E
 SIZES=(10000 15000 20000)
 FIRES=(1 3 5)
 
@@ -28,7 +27,6 @@ for SIZE in "${SIZES[@]}"; do
             --rows $SIZE --cols $SIZE \
             --iterations $ITERATIONS \
             --seed $SEED \
-            --wind $WIND \
             --fires $F \
             --no-window
             

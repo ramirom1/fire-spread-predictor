@@ -1,0 +1,28 @@
+Generando entorno 10000x10000 para 8 procesos...
+Agua:   8213337 (8.21334%)
+Bosque: 81538395 (81.5384%)
+Ciudad: 10248268 (10.2483%)
+Focos iniciales (1):
+  Foco 1: (5312, 7569)
+Viento: Sin viento
+Bloques MPI: 4x2
+Simulando 100000 iteraciones...
+El fuego se extinguio en la iteracion 15033.
+
+Metricas por rank:
+rank | iter | avg_iter_ms | avg_compute_ms | avg_halo_ms | avg_cand_ms | avg_ign_ms | avg_update_ms | avg_reduce_ms | avg_candidates | max_candidates | avg_active | max_active | total_new_fires
+0 | 15034 | 1.173 | 0.318 | 0.051 | 0.242 | 0.071 | 0.005 | 0.747 | 1530.224 | 4688 | 2471.765 | 7702 | 12386836
+1 | 15034 | 1.173 | 0.327 | 0.052 | 0.251 | 0.071 | 0.005 | 0.736 | 1560.867 | 6732 | 2487.062 | 10718 | 12463499
+2 | 15034 | 1.173 | 0.298 | 0.058 | 0.227 | 0.067 | 0.004 | 0.764 | 1395.732 | 3298 | 2250.093 | 5378 | 11275967
+3 | 15034 | 1.173 | 0.376 | 0.058 | 0.277 | 0.094 | 0.005 | 0.671 | 1865.507 | 7902 | 2309.380 | 10818 | 11573075
+4 | 15034 | 1.173 | 0.303 | 0.067 | 0.228 | 0.071 | 0.004 | 0.750 | 1439.027 | 3419 | 2160.637 | 5451 | 10827673
+5 | 15034 | 1.173 | 0.253 | 0.067 | 0.192 | 0.057 | 0.004 | 0.810 | 1126.225 | 5385 | 1812.475 | 8728 | 9082914
+6 | 15034 | 1.173 | 0.356 | 0.070 | 0.263 | 0.088 | 0.004 | 0.683 | 1789.830 | 6161 | 2426.507 | 7331 | 12160036
+7 | 15034 | 1.173 | 0.322 | 0.070 | 0.240 | 0.077 | 0.005 | 0.724 | 1541.547 | 7376 | 2179.949 | 9651 | 10924450
+
+Resumen de balance de carga:
+Desbalance por candidatos acumulados (max/promedio): 1.218
+Desbalance por computo acumulado (max/promedio): 1.180
+Desbalance por tiempo acumulado (max/promedio): 1.000
+Interpretacion: para balance de carga, priorizar candidatos y computo. El tiempo total puede ocultar diferencias por sincronizacion MPI.
+Tiempo paralelo: 17639.500 ms
